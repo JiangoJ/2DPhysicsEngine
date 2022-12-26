@@ -25,12 +25,12 @@ public:
             int xPos = randrange(0 + padding, screenWidth - padding);
             int yPos = randrange(0 + padding, screenHeight - padding);
 
-            if(isAABB == 3){
+            if(isAABB == 0){
                 Circle* c = new Circle(20.0, Vec2(xPos, yPos));
                 randomShapes.push_back(c);
             }
             else{
-                AABB* rect = new AABB(Vec2(xPos, yPos), 50.0, 50.0);
+                AABB* rect = new AABB(Vec2(xPos, yPos), 40.0, 40.0);
                 randomShapes.push_back(rect);
             }
 

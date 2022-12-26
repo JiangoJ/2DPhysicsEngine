@@ -9,7 +9,6 @@ bool Collisions::DetectCollision(Shape* s1, Shape* s2){
     float depth;
 
     if(t1 == Shape::Circle && t2 == Shape::Circle){
-
         Circle* c1 = dynamic_cast<Circle*>(s1); 
         Circle* c2 = dynamic_cast<Circle*>(s2);
 
@@ -22,7 +21,7 @@ bool Collisions::DetectCollision(Shape* s1, Shape* s2){
         }
     }
 
-    if(t1 == Shape::AABB && t2 == Shape::AABB){
+    else if(t1 == Shape::AABB && t2 == Shape::AABB){
         
         AABB* a1 = dynamic_cast<AABB*>(s1); 
         AABB* a2 = dynamic_cast<AABB*>(s2);
@@ -35,6 +34,30 @@ bool Collisions::DetectCollision(Shape* s1, Shape* s2){
             return true;
         }
 
+    }
+
+    else{ //Circle and AABB collision
+
+        AABB* ab;
+        Circle* c;
+
+        if(t1 == Shape::AABB){
+            
+           ab = dynamic_cast<AABB*>(s1);
+           c = dynamic_cast<Circle*>(s2);
+        }
+        else{
+
+           ab = dynamic_cast<AABB*>(s2);
+           c = dynamic_cast<Circle*>(s1);
+        }
+        if(IntersectAABBCircle(ab, c, normal, depth)){
+
+            ab->moveBy(normal * depth / 2.0);
+            c->moveBy(normal * -1 * depth / 2.0);
+
+            return true;
+        }
     }
 
     return false;
@@ -126,6 +149,49 @@ bool Collisions::IntersectAABBs(AABB* ab1, AABB* ab2, Vec2& normal, float& depth
     return true;
 }
 
+bool Collisions::IntersectAABBCircle(AABB* ab, Circle* c, Vec2& normal, float& depth){
+    
+    normal = Vec2();
+    depth = std::numeric_limits<float>::max();
+
+    // Separating Axis Theorem
+    for(int i = 0; i < 4; i++){
+
+        Vec2 p1 = ab->getCachedPoints()[i];
+        Vec2 p2 = ab->getCachedPoints()[(i+1)%4];
+
+        Vec2 edge = p2 - p1;
+        Vec2 axis = Vec2(-1*edge.getY(), edge.getX());
+
+        float maxA = 0.0, minA = 0.0, maxB = 0.0, minB = 0.0;
+
+        projectVertices(ab->getCachedPoints(), axis, maxA, minA);
+        projectCircle(c, axis, maxB, minB);
+
+        //Project Circle Center
+        
+        if(maxA <= minB || maxB <= minA){
+            return false;
+        }
+
+        float collisionDepth = std::min(maxA - minB, maxB - minA);
+        if(collisionDepth < depth){
+            depth = collisionDepth;
+            normal = axis;
+        }
+    }
+
+    depth /= normal.length();
+    normal.normalize();
+
+    // Check if the normal is pointing in the same direction of the two objects
+    Vec2 direction = ab->getTransformedOrigin() - c->getPosition();
+    if(Vec2::DotProduct(normal, direction) < 0){
+        normal *= -1;
+    }
+    return true;
+}
+
 void Collisions::projectVertices(const Vec2* points, const Vec2& axis, float& max, float& min){
 
     min = std::numeric_limits<float>::max();
@@ -142,7 +208,17 @@ void Collisions::projectVertices(const Vec2* points, const Vec2& axis, float& ma
         if(proj > max){
             max = proj;
         }
-   }
+    }
+
 }
 
+void Collisions::projectCircle(const Circle* c, const Vec2& axis, float& max, float& min){
+    Vec2 direction = Vec2::Normalize(axis);
+    Vec2 dirRadius = direction * c->getRadius();
 
+    Vec2 circleLeft = c->getPosition() - dirRadius;
+    Vec2 circleRight = c->getPosition() + dirRadius;
+
+    min = Vec2::DotProduct(axis, circleLeft);
+    max = Vec2::DotProduct(axis, circleRight);
+}

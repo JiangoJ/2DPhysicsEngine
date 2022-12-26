@@ -86,7 +86,7 @@ float CrossProduct(const Vec2& v, const Vec2& v2){
     return v.getX() * v2.getY() - v.getY() * v2.getX();
 }
 
-float Vec2::length(){
+float Vec2::length() const{
     return sqrt(getX() * getX() + getY() * getY());
 }
 
@@ -113,4 +113,9 @@ Vec2 Vec2::transform(VectorTransform vt, Vec2 center){
 float Vec2::distance(const Vec2& v1, const Vec2& v2){
 
     return sqrt(pow((v1.getX() - v2.getX()), 2) + pow((v1.getY() - v2.getY()), 2));
+}
+
+Vec2 Vec2::Normalize(const Vec2& v){
+
+    return Vec2(v.getX()/v.length(), v.getY()/v.length());
 }

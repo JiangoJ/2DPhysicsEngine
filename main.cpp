@@ -10,7 +10,7 @@
 int screenWidth = 1000;
 int screenHeight = 700;
 int padding = 50;
-int numberOfShapes = 50;
+int numberOfShapes = 10;
 
 std::vector<Shape*> randomShapes;
 

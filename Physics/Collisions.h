@@ -11,6 +11,11 @@ public:
 
     static bool IntersectAABBs(AABB* ab1, AABB* ab2, Vec2& normal, float& depth);
 
+    static bool IntersectAABBCircle(AABB* ab, Circle* c, Vec2& normal, float& depth);
+
 private:
     static void projectVertices(const Vec2* points, const Vec2& axis, float& max, float& min);
+
+    static void projectCircle(const Circle* c, const Vec2& axis, float& max, float& min)
+;
 };

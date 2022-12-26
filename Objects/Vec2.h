@@ -26,11 +26,12 @@ public:
 
     //Vec Operations
     static float distance(const Vec2& v1, const Vec2& v2);
-    float length();
+    float length() const;
     void normalize();
     static float DotProduct(const Vec2& v, const Vec2& v2);
     static float Distance(const Vec2& v, const Vec2& v2); 
     static float CrossProduct(const Vec2& v, const Vec2& v2); 
+    static Vec2 Normalize(const Vec2& v);
 
     //Transform Operations
     Vec2 transform(VectorTransform vt, Vec2 center);
